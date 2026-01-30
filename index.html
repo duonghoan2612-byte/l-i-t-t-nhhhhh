@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+
+<meta charset="UTF-8">
+<title>Love Letter</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+
+body{
+    height:100vh;
+    background:#fff;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    overflow:hidden;
+    font-family:"Segoe UI",sans-serif;
+    transition:background 1s ease;
+}
+
+/* nền tối khi mở */
+body.open-bg{
+    background:#000;
+}
+
+/* ================= TIM BAY ================= */
+.heart{
+    position:absolute;
+    bottom:-60px;
+    color:rgba(255,20,147,.95);
+    pointer-events:none;
+    animation:flyUp linear forwards;
+}
+
+@keyframes flyUp{
+    from{transform:translateY(0) scale(.6);opacity:0}
+    10%{opacity:1}
+    to{transform:translateY(-140vh) scale(1.4);opacity:0}
+}
+
+/* ================= SCENE ================= */
+.scene{
+    position:relative;
+    width:420px;
+    height:260px;
+    cursor:pointer;
+}
+
+/* ================= PHONG BÌ NGUYÊN ================= */
+.envelope-full{
+    position:absolute;
+    inset:0;
+    background:linear-gradient(145deg,#000000,#000000);
+    border-radius:18px;
+    box-shadow:0 16px 30px rgba(0,0,0,.3);
+    z-index:5;
+    transition:.6s cubic-bezier(.4,0,.2,1);
+    overflow:hidden;
+}
+
+.envelope-full::after{
+    content:"";
+    position:absolute;
+    inset:6px;
+    border:2px solid rgba(255,255,255,.85);
+    border-radius:14px;
+}
+
+.flap{
+    position:absolute;
+    inset:0;
+    background:linear-gradient(145deg,#f48ac6,#f877b5);
+    clip-path:polygon(0 0,100% 0,50% 48%);
+    z-index:3;
+}
+
+/* ================= BĂNG KEO ================= */
+.tape-wrap{
+    position:absolute;
+    top:100px;
+    left:60%;
+    width:180px;
+    height:34px;
+    transform:translateX(-50%);
+    z-index:6;
+    pointer-events:none;
+}
+
+.tape{
+    position:absolute;
+    inset:0;
+    background:linear-gradient(
+        90deg,
+        rgba(255,255,255,.35),
+        rgba(255,255,255,.15),
+        rgba(255,255,255,.35)
+    );
+    border:1px solid rgba(255,255,255,.4);
+    border-radius:6px;
+    transition:.6s ease;
+}
+
+.tape.left,.tape.right{width:50%}
+
+.tape.left{
+    left:0;
+    clip-path:polygon(0 0,100% 0,85% 50%,100% 100%,0 100%);
+}
+.tape.right{
+    right:0;
+    clip-path:polygon(15% 0,100% 0,100% 100%,15% 100%,0 50%);
+}
+
+.open .tape.left{
+    transform:translateX(-22px) rotate(-8deg);
+    opacity:0;
+}
+.open .tape.right{
+    transform:translateX(26px) rotate(10deg);
+    opacity:0;
+}
+
+/* ================= STICKER ================= */
+.stickers{position:absolute;inset:0;z-index:4}
+
+.sticker{
+    position:absolute;
+    font-size:26px;
+    opacity:.9;
+    filter:drop-shadow(0 3px 6px rgba(0,0,0,.25));
+    animation:wiggle 3s ease-in-out infinite;
+}
+
+@keyframes wiggle{
+    0%,100%{transform:rotate(var(--r))}
+    50%{transform:rotate(calc(var(--r) + 2deg))}
+}
+
+.s1{top:70px;left:40px;--r:-8deg}
+.s2{top:40px;right:60px;--r:6deg}
+.s3{top:120px;right:140px;--r:-6deg}
+.s4{bottom:40px;left:150px;--r:5deg}
+.s5{bottom:35px;right:40px;--r:-4deg}
+.s7{top:20px;left:160px;--r:-5deg}
+.s8{bottom:85px;left:80px;--r:6deg}
+.s10{bottom:62px;right:82px;--r:4deg}
+.s11{bottom:98px;right:46px;--r:-8deg}
+
+/* ================= GIẤY TRÁI TIM ================= */
+.paper{
+
+text-align:center;
+    line-height:1.5;
+
+    position:absolute;
+    top:18px;
+    left:50%;
+    width:260px;
+    height:240px;
+    background:#f7a3d6;
+    transform:translateX(-50%) scale(.7);
+    opacity:0;
+    transition:.6s cubic-bezier(.4,0,.2,1);
+    z-index:1;
+    box-shadow:0 14px 30px rgba(0,0,0,.35);
+    clip-path:path("M130 240 C130 240,0 150,0 80 C0 30,50 0,90 28 C115 48,130 75,130 75 C130 75,145 48,170 28 C210 0,260 30,260 80 C260 150,130 240,130 240 Z");
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:60px 40px;
+    text-align:center;
+    color:#d6336c;
+    font-size:18px;
+}
+
+/* ================= PHONG BÌ XÉ – VẾT RĂNG ================= */
+.envelope-split{
+    position:absolute;
+    inset:0;
+    z-index:4;
+    opacity:0;
+    pointer-events:none;
+}
+
+/* khi mở thì cho click */
+.open .envelope-split{
+    pointer-events:auto;
+}
+
+.half{
+    position:absolute;
+    top:0;
+    width:50%;
+    height:100%;
+    background:linear-gradient(145deg,#f072b6,#e4559a);
+    box-shadow:0 16px 30px rgba(0,0,0,.4);
+    transition:1s cubic-bezier(.22,.61,.36,1);
+}
+
+.left{
+    left:0;
+    border-radius:18px 0 0 18px;
+    clip-path:polygon(
+        0 0,100% 0,
+        92% 6%,100% 12%,85% 20%,100% 28%,
+        88% 36%,100% 44%,82% 52%,100% 60%,
+        90% 70%,100% 80%,86% 90%,100% 100%,0 100%
+    );
+}
+
+.right{
+    right:0;
+    border-radius:0 18px 18px 0;
+    clip-path:polygon(
+        8% 0,100% 0,100% 100%,8% 100%,
+        0 92%,12% 86%,0 78%,15% 70%,
+        0 62%,10% 54%,0 46%,14% 38%,
+        0 28%,12% 18%,0 8%
+    );
+}
+
+/* ================= OPEN ================= */
+.open .envelope-full{opacity:0}
+.open .envelope-split{opacity:1}
+.open .left{transform:translateX(-160px) rotate(-2deg)}
+.open .right{transform:translateX(160px) rotate(2deg)}
+.open .paper{opacity:1;transform:translateX(-50%) scale(1)}
+
+/* ================= LỰA CHỌN TRONG THƯ ================= */
+.choice-box{
+    position:absolute;
+    bottom:24px;
+    width:120px;
+    height:60px;
+    background:#fff;
+    border-radius:14px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:600;
+    font-size:14px;
+    opacity:0;
+    transform:scale(.7);
+    transition:.6s cubic-bezier(.22,.61,.36,1);
+    box-shadow:0 10px 20px rgba(0,0,0,.25);
+}
+
+/* gắn vào nửa thư */
+.left .choice-box{
+    left:18px;
+    color:#ff4d6d;
+}
+.right .choice-box{
+    right:18px;
+    color:#ff2f92;
+}
+
+/* hiện khi mở */
+.open .choice-box{
+    opacity:1;
+    transform:scale(1);
+}
+
+/* hover cho đã */
+.choice-box:hover{
+    transform:scale(1.08);
+    box-shadow:0 0 18px rgba(255,120,180,.9);
+}
+
+/* ===== MOBILE FIX ===== */
+@media (max-width: 600px){
+    .scene{
+        width:90vw;
+        height:55vw;
+        max-width:420px;
+        max-height:260px;
+    }
+
+    .choice-box{
+        font-size:15px;
+        height:64px;
+    }
+
+    /* mobile không có hover */
+    .choice-box:hover{
+        transform:scale(1);
+        box-shadow:0 10px 20px rgba(0,0,0,.25);
+    }
+
+    .choice-box:active{
+        transform:scale(0.95);
+        box-shadow:0 0 18px rgba(255,120,180,.9);
+    }
+}
+
+
+</style>
+</head>
+
+<body>
+
+<div class="scene" id="scene">
+
+  <div class="paper" id="paperText">
+    Em Đồng Ý Làm Người Yêu Anh Nhé 💗
+</div>
+
+
+    <div class="envelope-full">
+        <div class="flap"></div>
+
+        <div class="tape-wrap">
+            <div class="tape left"></div>
+            <div class="tape right"></div>
+        </div>
+
+        <div class="stickers">
+            <span class="sticker s1">🌸</span>
+            <span class="sticker s2">✨</span>
+            <span class="sticker s3">💖</span>
+            <span class="sticker s4">🧸</span>
+            <span class="sticker s5">🌼</span>
+            <span class="sticker s7">🎀</span>
+            <span class="sticker s8">🍓</span>
+            <span class="sticker s10">🌷</span>
+            <span class="sticker s11">✨</span>
+        </div>
+    </div>
+
+  <div class="envelope-split">
+  <div class="half left">
+    <div class="choice-box no">❌ Không đồng ý</div>
+</div>
+<div class="half right">
+    <div class="choice-box yes">💖 Đồng ý</div>
+</div>
+
+</div>
+
+<script>
+let opened=false, heartInterval;
+const scene=document.getElementById("scene");
+const paperText=document.getElementById("paperText");
+const yesBtn=document.querySelector(".yes");
+const noBtn=document.querySelector(".no");
+
+function spawnHearts(n){
+    for(let i=0;i<n;i++){
+        const h=document.createElement("div");
+        h.className="heart";
+        h.innerText=Math.random()>0.5?"❤":"💗";
+        h.style.left=Math.random()*100+"vw";
+        h.style.fontSize=14+Math.random()*30+"px";
+        h.style.animationDuration=4+Math.random()*5+"s";
+        document.body.appendChild(h);
+        setTimeout(()=>h.remove(),10000);
+    }
+}
+
+scene.onclick=()=>{
+    opened=!opened;
+    scene.classList.toggle("open",opened);
+    document.body.classList.toggle("open-bg",opened);
+    if(opened){
+        spawnHearts(50);
+        heartInterval=setInterval(()=>spawnHearts(12),150);
+    }else clearInterval(heartInterval);
+};
+
+yesBtn.onclick=e=>{
+    e.stopPropagation();
+    paperText.innerText="Anh biết em sẽ đồng ý mà 💕 YÊU EM NẮM";
+};
+noBtn.onclick=e=>{
+    e.stopPropagation();
+    noBtn.innerText="Em phải đồng ý 😤💗";
+};
+
+
+/* ===== MOBILE TOUCH SUPPORT ===== */
+scene.addEventListener("touchstart", e=>{
+    if(e.target.closest(".choice-box")) return;
+    scene.onclick();
+});
+
+yesBtn.addEventListener("touchstart", e=>{
+    e.stopPropagation();
+    paperText.innerText="Anh biết em sẽ đồng ý mà 💕 YÊU EM NẮM";
+});
+
+noBtn.addEventListener("touchstart", e=>{
+    e.stopPropagation();
+    noBtn.innerText="Em phải đồng ý 😤💗";
+});
+
+
+
+</script>
+
+</body>
+</html>
