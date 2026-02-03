@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -85,8 +86,8 @@ body.open-bg{
 /* ================= SCENE ================= */
 .scene{
     position:relative;
-    width:420px;
-    height:260px;
+    width:clamp(300px, 80vw, 420px);
+    aspect-ratio: 420 / 260;
     cursor:pointer;
 }
 
@@ -196,11 +197,11 @@ body.open-bg{
 text-align:center;
     line-height:1.5;
 
-    position:absolute;
+      position:absolute;
     top:18px;
     left:50%;
-    width:260px;
-    height:240px;
+    width:65%;
+    aspect-ratio:1/1;
     background:#f7a3d6;
     transform:translateX(-50%) scale(.7);
     opacity:0;
@@ -208,13 +209,16 @@ text-align:center;
     z-index:1;
     box-shadow:0 14px 30px rgba(0,0,0,.35);
     clip-path:path("M130 240 C130 240,0 150,0 80 C0 30,50 0,90 28 C115 48,130 75,130 75 C130 75,145 48,170 28 C210 0,260 30,260 80 C260 150,130 240,130 240 Z");
+
     display:flex;
     align-items:center;
     justify-content:center;
-    padding:60px 40px;
+    padding:clamp(20px,4vw,40px);
     text-align:center;
     color:#d6336c;
-    font-size:18px;
+
+    font-size:clamp(16px, 2.8vw, 20px);
+    line-height:1.6;
 }
 
 /* ================= PHONG BÌ XÉ – VẾT RĂNG ================= */
@@ -389,6 +393,90 @@ text-align:center;
 }
 
 
+
+/* ===== CONFIRM SCREEN ===== */
+.confirm-screen{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.88);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:28px;
+    opacity:0;
+    pointer-events:none;
+    transition:.8s ease;
+    z-index:9999;
+}
+.confirm-text{
+    max-width:90vw;
+    width:720px;
+    padding:0 12px;
+
+    color:#fff;
+    font-size:32px;
+    line-height:1.8;
+    text-align:center;
+    font-weight:500;
+    animation:fadeUp .8s ease;
+}
+
+.confirm-screen.show{
+    opacity:1;
+    pointer-events:auto;
+}
+
+
+
+
+.confirm-btn{
+    background:#ff4d6d;
+    color:#fff;
+    padding:18px 44px;   /* 👈 nút to hơn */
+    border-radius:34px;
+    font-size:22px;      /* 👈 chữ trong nút to */
+    font-weight:600;
+    cursor:pointer;
+    box-shadow:0 10px 24px rgba(255,80,120,.6);
+    transition:.3s ease;
+}
+
+
+.confirm-btn:hover{
+    transform:scale(1.08);
+}
+
+@keyframes fadeUp{
+    from{opacity:0;transform:translateY(20px)}
+    to{opacity:1;transform:translateY(0)}
+}
+
+@media (max-width: 768px){
+    .confirm-text{
+        font-size:36px;   /* mobile chữ rất to */
+        line-height:1.9;
+    }
+
+    .confirm-btn{
+        font-size:24px;
+        padding:20px 48px;
+    }
+}
+
+@media (hover:none){
+    .choice-box:hover{
+        transform:none;
+        box-shadow:0 10px 20px rgba(0,0,0,.25);
+    }
+
+    .choice-box:active{
+        transform:scale(.96);
+        box-shadow:0 6px 14px rgba(0,0,0,.3);
+    }
+}
+
+
 </style>
 </head>
 
@@ -441,6 +529,29 @@ text-align:center;
 
 </div>
 
+
+<!-- ===== CONFIRM SCREEN ===== -->
+<div class="confirm-screen" id="confirmScreen">
+    <div class="confirm-text" id="confirmText">
+        Anh Biết Rằng Chúng Ta Có Nhiều Lúc Cãi Vã.<br>
+        Cũng Có Nhiều Lúc Cảm Thấy Mệt Mỏi <br>
+         Nhiều Lúc Anh Làm Em Tổn Thương, Em Buồn .<br>
+        Nhưng Tình Cảm Anh Dành Cho Em <br>
+        Luôn Là Những Điều Thật Lòng<br>
+         Dù Sau Này Có Ra Sao<br>
+           Anh Mong Em Sẽ Không Hối Hận <br>
+           Với Lựa Chọn Của Bản Thân Ngày Hôm Nay. <br>
+        Em Chắc Chắn Với Lựa Chọn Của Mình Chứ?
+    </div>
+
+    <div class="confirm-btn" id="confirmBtn">
+        Em chắc chứ?
+    </div>
+</div>
+
+
+
+
 <script>
 let opened = false;
 let acceptedOnce = false;
@@ -451,10 +562,13 @@ const scene = document.getElementById("scene");
 const paperText = document.getElementById("paperText");
 const yesBtn = document.querySelector(".yes");
 const noBtn = document.querySelector(".no");
+const confirmScreen = document.getElementById("confirmScreen");
+const confirmBtn = document.getElementById("confirmBtn");
 
 /* ================= HEART ================= */
 function spawnHearts(n){
-    for(let i=0;i<n;i++){
+    const scale = window.innerWidth < 768 ? 0.7 : 1;
+    for(let i=0;i<n*scale;i++){
         const h=document.createElement("div");
         h.className="heart";
         h.innerText=Math.random()>0.5?"❤":"💗";
@@ -465,6 +579,7 @@ function spawnHearts(n){
         setTimeout(()=>h.remove(),10000);
     }
 }
+
 
 /* ================= IMAGE FLY ================= */
 const flyImages = [
@@ -485,7 +600,9 @@ const flyImages = [
 "https://scontent.fhph6-1.fna.fbcdn.net/v/t39.30808-6/625905017_1583871372758658_8009687802796256263_n.jpg?_nc_cat=106&ccb=1-7&_nc_sid=833d8c&_nc_ohc=yV8VtCwbBQMQ7kNvwG8Zygf&_nc_oc=Adk2WsT7q8JIaMy1emNflW_YOCDtAoMJkCVsCFgOdq61gQ2UoyJMMmJdnwsclbMOUqRwgagxZdsnDMD4yvT9J3mS&_nc_zt=23&_nc_ht=scontent.fhph6-1.fna&_nc_gid=_GGnUtwJjDSlaPmnIHkmjA&oh=00_Afs7qkK_k31qgbCpK1Z08nyBnq38BIaFr_AH35wNDUtjwA&oe=6983E573",
 ];
 function spawnImages(n){
-    for(let i=0;i<n;i++){
+    const scale = window.innerWidth < 768 ? 0.6 : 1;
+
+    for(let i=0;i<n*scale;i++){
         const wrap = document.createElement("div");
         wrap.className = "fly-img";
 
@@ -493,17 +610,18 @@ function spawnImages(n){
         img.src = flyImages[Math.floor(Math.random()*flyImages.length)];
 
         wrap.appendChild(img);
-
         wrap.style.left = Math.random()*100 + "vw";
-        const size = 120 + Math.random()*60; // 70px → 110px
-wrap.style.width = size + "px";
-wrap.style.height = size + "px";
+
+        const size = (120 + Math.random()*60) * scale;
+        wrap.style.width = size + "px";
+        wrap.style.height = size + "px";
         wrap.style.animationDuration = 5 + Math.random()*4 + "s";
 
         document.body.appendChild(wrap);
         setTimeout(()=>wrap.remove(),10000);
     }
 }
+
 
 
 
@@ -586,21 +704,21 @@ yesBtn.onclick = e => {
 
     if(!acceptedOnce){
         acceptedOnce = true;
-        secondOpen = true;
 
         explodeAllHearts();
-
-
-
-
-
+        resetAllEffects();
 
         opened = false;
         scene.classList.remove("open");
         document.body.classList.remove("open-bg");
-        clearInterval(heartInterval);
+
+        // hiện màn xác nhận
+        setTimeout(()=>{
+            confirmScreen.classList.add("show");
+        },600);
     }
 };
+
 
 /* ================= KHÔNG ĐỒNG Ý ================= */
 noBtn.onclick = e => {
@@ -625,12 +743,45 @@ noBtn.addEventListener("touchstart", e=>{
     e.stopPropagation();
     noBtn.onclick(e);
 });
+
+
+/* ================= CONFIRM BTN ================= */
+confirmBtn.onclick = () => {
+    confirmScreen.classList.remove("show");
+
+    secondOpen = true;
+    acceptedOnce = true;
+
+    setTimeout(()=>{
+        opened = true;
+
+        scene.classList.add("open");
+        document.body.classList.add("open-bg");
+
+        resetAllEffects();
+
+        paperText.innerText = "Anh biết em sẽ đồng ý mà 💕";
+        scene.classList.add("hide-choice");
+        scene.classList.add("show-images");
+
+        spawnHearts(160);
+        spawnImages(10);
+
+        heartInterval = setInterval(()=>{
+            spawnHearts(14);
+            spawnImages(2);
+        },260);
+    },300);
+};
+
+
+
+
 </script>
+
 
 
 
 
 </body>
 </html>
-
-
